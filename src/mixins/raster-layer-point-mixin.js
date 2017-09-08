@@ -13,7 +13,7 @@ const AUTOSIZE_RANGE_DEFAULTS = [2.0, 5.0]
 const AUTOSIZE_RANGE_MININUM = [1, 1]
 const SIZING_THRESHOLD_FOR_AUTOSIZE_RANGE_MININUM = 1500000
 
-function getSizing (sizeAttr, cap, lastFilteredSize, pixelRatio, layerName) {
+function getSizing (sizeAttr, cap, lastFilteredSize = cap, pixelRatio, layerName) {
   if (typeof sizeAttr === "number") {
     return sizeAttr
   } else if (typeof sizeAttr === "object" && sizeAttr.type === "quantitative") {
@@ -162,6 +162,17 @@ function getScales ({size, color}, layerName) {
       nullValue: "#CACACA"
     })
   }
+
+  if (typeof color === "object" && color.type === "quantitative") {
+    scales.push({
+      name: layerName + "_fillColor",
+      type: "linear",
+      domain: color.domain,
+      range: color.range,
+      clamp: true
+    })
+  }
+
 
   return scales
 }
@@ -453,7 +464,6 @@ export default function rasterLayerPointMixin (_layer) {
   }
 
   _layer._destroyLayer = function (chart) {
-    _layer.sampling(false)
     const xDim = _layer.xDim()
     if (xDim) {
       xDim.dispose()
